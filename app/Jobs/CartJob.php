@@ -23,6 +23,8 @@ class CartJob implements ShouldQueue, ShouldBeUnique
 
     public $order;
 
+    public $tries = 3;
+
     public function __construct(Order $order)
     {
         $this->order = $order;
@@ -40,7 +42,7 @@ class CartJob implements ShouldQueue, ShouldBeUnique
         $response = $client->addToCart($order->goods_id, $order->sku);
         log_res($response, "Add to cart | {$order->goods_id} | {$order->sku}");
         $cart = json_decode($client->get_cart());
-        if($cart->code != 0){
+        if ($cart->code != 0) {
             $order->status = 'Failed: cart response code mismatch';
             $order->save();
             $this->fail();
@@ -59,9 +61,12 @@ class CartJob implements ShouldQueue, ShouldBeUnique
                     if ($value->product->sku_code != $order->sku && $value->is_checked == 1) {
                         $res = $client->change_cart_item_status($value->id, 2);
                         log_res($res->getContents(), 'Unselect other cart Items');
-                    } else {
-                        $res = $client->change_cart_item_status($value->id, 1);
-                        log_res($res->getContents(), 'Select cart Items');
+                    }
+                    if ($value->product->sku_code == $order->sku) {
+                        if ($value->is_checked == 0) {
+                            $res = $client->change_cart_item_status($value->id, 1);
+                            log_res($res->getContents(), 'Select cart Items');
+                        }
                         if ($value->quantity != $order->quantity) {
                             $res = $client->change_cart_item_quantity($value->id, $order->quantity);
                             log_res($res->getContents(), 'Change cart item quantity');
@@ -72,6 +77,5 @@ class CartJob implements ShouldQueue, ShouldBeUnique
         }
 
         dispatch(new CheckoutJob($order));
-
     }
 }

@@ -21,6 +21,7 @@ class CheckoutJob implements ShouldQueue, ShouldBeUnique
      * @return void
      */
     public $order;
+    public $tries = 3;
     public function __construct(Order $order)
     {
         $this->order = $order;
@@ -36,9 +37,9 @@ class CheckoutJob implements ShouldQueue, ShouldBeUnique
         $client = new SheinOrderUtility;
         $order = $this->order;
         $res = $client->checkout_cart($order);
-        $res2 = $client->checkout_cart_2($order);
         log_res($res->getContents(), 'Checkout Cart 1');
-        log_res($res2->getContents(), 'Checkout Cart 2');
+        // $res2 = $client->checkout_cart_2($order);
+        // log_res($res2->getContents(), 'Checkout Cart 2');
         dispatch(new PlaceOrderJob($order));
     }
 }

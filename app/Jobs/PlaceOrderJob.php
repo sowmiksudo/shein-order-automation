@@ -21,6 +21,7 @@ class PlaceOrderJob implements ShouldQueue, ShouldBeUnique
      * @return void
      */
     public $order;
+    public $tries = 5;
     public function __construct(Order $order)
     {
         $this->order = $order;
@@ -37,24 +38,25 @@ class PlaceOrderJob implements ShouldQueue, ShouldBeUnique
         $client = new SheinOrderUtility;
         $res = $client->place_order(4727);
         $res = json_decode($res->getContents());
-        log_res(json_encode($res), 'Confirm COD');
+        log_res(json_encode($res), 'Place Order');
 
         if($res->code != 0){
-            $order->status = 'Failed: Could not place order';
+            $order->status = 'Failed: Could not place order | ' . $res->msg;
             $order->save();
             $this->fail();
             return;
         }
 
         $bill = $res->info->order->billno;
-        $amount = $res->info->totalPrice->amount;
+        $amount = $res->info->totalPrice->amount ?? null;
+        dump($res->info);
         $order->billno = $bill;
         $order->price = $amount;
         $order->save();
 
         $res = $client->cod_confirm($bill);
         if(json_decode($res)->code != 0){
-            $order->status = 'Failed: Could not confirm Cash on delivery';
+            $order->status = 'Failed: Could not confirm Cash on delivery | ' . json_decode($res)->msg;
             $order->save();
             $this->fail();
             return;
@@ -62,5 +64,6 @@ class PlaceOrderJob implements ShouldQueue, ShouldBeUnique
         log_res($res->getContents(), 'Confirm COD');
 
         $order->status = 'success';
+        $order->save();
     }
 }
