@@ -40,7 +40,10 @@ class OrderController extends Controller
     {
         $order = Order::create($request->only('goods_id', 'sku', 'quantity'));
         dispatch(new OrderJob($order));
-        return $request;
+        return response()->json([
+            "success"=>true,
+            "order" => $order
+        ]);
     }
 
     /**
