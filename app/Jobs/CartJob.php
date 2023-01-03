@@ -11,7 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use App\Utility\SheinOrderUtility;
 
-class CartJob implements ShouldQueue, ShouldBeUnique
+class CartJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -39,6 +39,8 @@ class CartJob implements ShouldQueue, ShouldBeUnique
     {
         $client = new SheinOrderUtility;
         $order = $this->order;
+        $order->status = 'processing';
+        $order->save();
         $response = $client->addToCart($order->goods_id, $order->sku);
         log_res($response, "Add to cart | {$order->goods_id} | {$order->sku}");
         $cart = json_decode($client->get_cart());

@@ -34,11 +34,7 @@ class OrderJob implements ShouldQueue, ShouldBeUnique
 
     public function handle()
     {
-        $order = $this->order;
-        $order->status = 'processing';
-        $order->save();
-        dispatch(new CartJob($order));
-
+        echo 'OLD file';
     }
 
 }

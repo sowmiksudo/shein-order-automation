@@ -8,10 +8,10 @@ use GuzzleHttp\Psr7\Request;
 
 class SheinOrderUtility
 {
+    public $client;
 
     public function __construct()
     {
-
         $this->client = new GuzzleHttp\Client([
             'proxy' => env('APP_PROXY'),
         ]);

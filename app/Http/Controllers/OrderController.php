@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\OrderRequest;
-use App\Jobs\OrderJob;
-use App\Jobs\IpLoggerJob;
+use Throwable;
+use App\Jobs\CartJob;
 use App\Models\Order;
-use App\Utility\SheinOrderUtility;
+use App\Jobs\OrderJob;
+use App\Jobs\CheckoutJob;
+use App\Jobs\IpLoggerJob;
 use Illuminate\Http\Request;
+use App\Utility\SheinOrderUtility;
+use App\Http\Requests\OrderRequest;
+use App\Jobs\PlaceOrderJob;
+use Illuminate\Support\Facades\Bus;
 
 class OrderController extends Controller
 {
@@ -18,7 +23,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        
+
         $info = (new SheinOrderUtility)->ip_info();
         dispatch(new IpLoggerJob($info));
         return $info;
@@ -44,7 +49,14 @@ class OrderController extends Controller
     public function store(OrderRequest $request)
     {
         $order = Order::create($request->only('goods_id', 'sku', 'quantity'));
-        dispatch(new OrderJob($order));
+
+        Bus::chain([
+            new CartJob($order),
+            new CheckoutJob($order),
+            new PlaceOrderJob($order),
+        ])->catch(function(Throwable $e){
+            log_res($e->getMessage());
+        })->dispatch();
         return response()->json([
             "success"=>true,
             "order" => $order
