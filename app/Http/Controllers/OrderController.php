@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\OrderRequest;
 use App\Jobs\OrderJob;
+use App\Jobs\IpLoggerJob;
 use App\Models\Order;
 use App\Utility\SheinOrderUtility;
 use Illuminate\Http\Request;
@@ -17,7 +18,11 @@ class OrderController extends Controller
      */
     public function index()
     {
-        return (new SheinOrderUtility)->ip_info();
+        
+        $info = (new SheinOrderUtility)->ip_info();
+        dispatch(new IpLoggerJob($info));
+        return $info;
+
     }
 
     /**
