@@ -41,6 +41,15 @@ class CartJob implements ShouldQueue
         $order = $this->order;
         $order->status = 'processing';
         $order->save();
+
+        // $client->send_update($order);
+
+        $product = json_decode($client->get_product_info($order->goods_id));
+
+        $order->cat_id = $product->info->cat_id;
+        $order->description = $product->info->goods_name . ' - ' . $order->variant;
+        $order->save();
+
         $response = $client->addToCart($order->goods_id, $order->sku);
         log_res($response, "Add to cart | {$order->goods_id} | {$order->sku}");
         $cart = json_decode($client->get_cart());
@@ -78,6 +87,5 @@ class CartJob implements ShouldQueue
             }
         }
 
-        dispatch(new CheckoutJob($order));
     }
 }

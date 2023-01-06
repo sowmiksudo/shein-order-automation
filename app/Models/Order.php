@@ -5,10 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use function Illuminate\Events\queueable;
+
 class Order extends Model
 {
-    use HasFactory;
     protected $guarded = [];
 
+    use HasFactory;
 
+
+    protected static function boot()
+    {
+        parent::boot();
+        /**
+         * Write code on Method
+         *
+         * @return void
+         */
+        static::updated(queueable(function ($order) {
+            send_update($order);
+        }));
+    }
 }

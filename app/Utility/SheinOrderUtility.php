@@ -14,7 +14,53 @@ class SheinOrderUtility
     {
         $this->client = new GuzzleHttp\Client([
             'proxy' => env('APP_PROXY'),
+            'verify' => false
         ]);
+    }
+
+    public function get_product_info($goods_id)
+    {
+
+        $client = $this->client;
+        $headers = [
+            'Host' => 'api-service.shein.com',
+            'app-from' => 'shein',
+            'siteuid' => 'android',
+            'appcountry' => 'US',
+            'branch' => '',
+            'devtype' => 'Android',
+            'clientid' => '100',
+            'servertime' => '1671815552',
+            'accept' => 'application/json',
+            'device' => 'realmeC25Series Android12',
+            'usercountry' => 'MY',
+            'applanguage' => 'en',
+            'version' => '8.7.6',
+            'devicelanguage' => 'en',
+            'sortuid' => '1103207067',
+            'dev-id' => 'shein_4d716643-e8fa-32d8-9aa8-f5bcafc91a44',
+            'device_language' => 'en',
+            'apptype' => 'shein',
+            'localcountry' => 'MY',
+            'smdeviceid' => '20221209170825cbb532d50ef9f8ec2b2b5ed9f35d607701fab349c3378c0d',
+            'deviceid' => 'shein_4d716643-e8fa-32d8-9aa8-f5bcafc91a44',
+            'appname' => 'shein app',
+            'newuid' => '1103207067',
+            'appversion' => '8.7.6',
+            'language' => 'en',
+            'currency' => 'MYR',
+            'network-type' => 'WIFI',
+            'os-version' => '12',
+            'devicesystemversion' => 'Android12',
+            'appcurrency' => 'MYR',
+            'user-agent' => 'Shein 8.7.6 Android 12 realme C25 Series US en 1103207067',
+            'accept-encoding' => 'gzip',
+            'x-gw-auth' => 'a=vhOvoNStVeIKfdWT0Gp55rGPHqjicT@8.6.4&b=1671815604709&d=-884979813&e=u9kQ9YjMwMWU4OTc1MjQzNDJlMzZjNGU0ZjYyYjgwNjEzN2Y5OTJmNjg4N2M4NzJmZmZkZmNkM2Q4Y2VkNjIzZTA1ZQ%3D%3D',
+            'Cookie' => '__cf_bm=FROhrR.NL_kcGs1DTk8zwT6wadIVwwTqgqSutxp6uWs-1672922307-0-AdwPge2HYqEHHrHW7F2UUQc9Hr3Sn32yBhsi6WomKYwWI4EEJYDBeUTS+3Xh5VFspVTkbyudiHerYQv4IEaamcA='
+        ];
+        $request = new Request('GET', 'https://api-service.shein.com/product/get_goods_detail_first_part?rule_id=is_pde%3D3%26rule_id%3Drec_ver%3AS93V1.0&userSwitchLocalCountry=&recPdRuleIdAbtParam=is_pde%3D3%26rule_id_122%3Drec_ver%3AS122V1.0&userSwitchSizeUnit=&mall_code=1&abtParamsCCCTemplate=&abtParamsSkcOut=type%3DB&goods_id=' . $goods_id . '&abtParamsProd2Body=rule%3D1727_1766_767%3AB&recStoreGoodsAbtParam=', $headers);
+        $res = $client->sendAsync($request)->wait();
+        return $res->getBody();
     }
 
     public function ip_info()
@@ -557,5 +603,77 @@ class SheinOrderUtility
         $request = new Request('GET', 'https://api-service.shein.com/order/cod/verify/free?billno=' . $billno, $headers);
         $res = $client->sendAsync($request)->wait();
         return $res->getBody();
+    }
+
+
+    public function order_sum($billno)
+    {
+        $client = $this->client;
+        $headers = [
+            'Host' => 'api-service.shein.com',
+            'app-from' => 'shein',
+            'siteuid' => 'android',
+            'appcountry' => 'US',
+            'branch' => '',
+            'devtype' => 'Android',
+            'clientid' => '100',
+            'servertime' => now()->getTimestamp(),
+            'accept' => 'application/json',
+            'device' => 'realmeC25Series Android12',
+            'usercountry' => 'MY',
+            'applanguage' => 'en',
+            'version' => '8.7.6',
+            'devicelanguage' => 'en',
+            'sortuid' => get_settings('shein_uid'),
+            'dev-id' => 'shein_4d716643-e8fa-32d8-9aa8-f5bcafc91a44',
+            'device_language' => 'en',
+            'apptype' => 'shein',
+            'localcountry' => 'MY',
+            'smdeviceid' => get_settings('smdeviceid'),
+            'deviceid' => 'shein_4d716643-e8fa-32d8-9aa8-f5bcafc91a44',
+            'appname' => 'shein app',
+            'appversion' => '8.7.6',
+            'newuid' => get_settings('shein_uid'),
+            'language' => 'en',
+            'currency' => 'MYR',
+            'network-type' => 'WIFI',
+            'token' => get_token(),
+            'os-version' => '12',
+            'devicesystemversion' => 'Android12',
+            'appcurrency' => 'MYR',
+            'user-agent' => 'Shein 8.7.6 Android 12 realme C25 Series US en 1103207067',
+            'accept-encoding' => 'gzip',
+            'x-gw-auth' => get_settings('x-gw-auth')
+        ];
+        $request = new Request('GET', 'https://api-service.shein.com/order/get_order_detail?page_from=pay_success&billno=' . $billno, $headers);
+        $res = $client->sendAsync($request)->wait();
+        return $res->getBody();
+    }
+
+    public function send_update($order)
+    {
+        $order = $order->fresh();
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'http://localhost/comp/api/orders/shein/update',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => "order_id={$order->order_id}&order_details_id={$order->order_details_id}&status={$order->status}",
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/x-www-form-urlencoded'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        curl_close($curl);
+        log_res($response, "UPDATE ORDER STATUS {$order->order_details_id} | {$order->status}");
+        return $response;
     }
 }

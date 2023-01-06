@@ -15,15 +15,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+
+Route::get('/ip', [OrderController::class, 'ip']);
+
+Route::middleware(['auth', 'verified'])
+    ->resource('dashboard', OrderController::class)
+    ->name('index', 'dashboard')
+    ->name('show', 'order');
+
+Route::middleware(['auth', 'verified'])->group(function(){
+    Route::get('product/{id}', [OrderController::class, 'product']);
+    Route::get('retry/{id}', [OrderController::class, 'retry'])->name('orders.retry');
+    Route::post('/export', [OrderController::class, 'export'])->name('export');
 });
-
-Route::get('/ip', [OrderController::class, 'index']);
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -31,4 +35,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

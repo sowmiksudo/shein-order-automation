@@ -26,6 +26,8 @@ class OrderRequest extends FormRequest
         return [
             'goods_id'=>['required'],
             'sku' => ['required'],
+            'order_details_id' => ['required'],
+            'order_id' => ['required'],
             'quantity' => ['required', 'integer']
         ];
     }

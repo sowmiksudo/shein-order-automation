@@ -40,6 +40,5 @@ class CheckoutJob implements ShouldQueue
         log_res($res->getContents(), 'Checkout Cart 1');
         // $res2 = $client->checkout_cart_2($order);
         // log_res($res2->getContents(), 'Checkout Cart 2');
-        dispatch(new PlaceOrderJob($order));
     }
 }

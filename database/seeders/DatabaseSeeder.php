@@ -22,7 +22,8 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
-            ConfigSeeder::class
+            ConfigSeeder::class,
+            ContactSeeder::class
         ]);
     }
 }

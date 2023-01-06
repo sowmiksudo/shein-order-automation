@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\OrderController as ApiOrderController;
 use App\Http\Controllers\OrderController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,5 +20,9 @@ Route::prefix('v1')->group(function(){
     Route::prefix('order')->group(function(){
         Route::post('/place', [OrderController::class, 'store']);
     });
+
+    Route::resource('orders', ApiOrderController::class);
+    Route::get('orders/{order}/retry', [ApiOrderController::class, 'retry']);
+
 
 });

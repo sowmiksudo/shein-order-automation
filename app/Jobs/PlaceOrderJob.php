@@ -21,7 +21,9 @@ class PlaceOrderJob implements ShouldQueue
      * @return void
      */
     public $order;
+
     public $tries = 5;
+
     public function __construct(Order $order)
     {
         $this->order = $order;
@@ -35,12 +37,13 @@ class PlaceOrderJob implements ShouldQueue
     public function handle()
     {
         $order = $this->order;
+        $order = $order->fresh();
         $client = new SheinOrderUtility;
         $res = $client->place_order(4727);
-        $res = json_decode($res->getContents());
+        $res = json_decode($res);
         log_res(json_encode($res), 'Place Order');
 
-        if($res->code != 0){
+        if($res->code != "0"){
             $order->status = 'Failed: Could not place order | ' . $res->msg;
             $order->save();
             $this->fail();
@@ -49,21 +52,9 @@ class PlaceOrderJob implements ShouldQueue
 
         $bill = $res->info->order->billno;
         $amount = $res->info->totalPrice->amount ?? null;
-        dump($res->info);
         $order->billno = $bill;
         $order->price = $amount;
         $order->save();
 
-        $res = $client->cod_confirm($bill);
-        if(json_decode($res)->code != 0){
-            $order->status = 'Failed: Could not confirm Cash on delivery | ' . json_decode($res)->msg;
-            $order->save();
-            $this->fail();
-            return;
-        }
-        log_res($res->getContents(), 'Confirm COD');
-
-        $order->status = 'success';
-        $order->save();
     }
 }

@@ -17,7 +17,7 @@ class ConfigSeeder extends Seeder
     {
         DB::table('configs')->insert([
             'key' => 'token',
-            'value' => 'MDEwMDE.eyJiIjo3LCJnIjoxNjcyMTY3MzYzLCJyIjoiU0RTcDZFIiwidCI6MiwibSI6NDE0NDA2MDIyMCwibCI6MTY3MjE2NzM2M30.c9dcd94b3b60513b.69ac87d046cae92371752c755544fbde6e48fb338873b406807103aed54e46a1'
+            'value' => 'MDEwMDE.eyJiIjo3LCJnIjoxNjcyMjk5NDQ2LCJyIjoiMDJVVk9SIiwidCI6MiwibSI6MTEwMzIwNzA2NywibCI6MTY3MjMyMzQxNX0.78fae653b8717eb1.7f4e4b711b7fa90a806a7e1d937664202db9ba05d251dac6f8f4c09c116c6a51'
         ]);
         DB::table('configs')->insert([
             'key' => 'smdeviceid',
@@ -25,11 +25,15 @@ class ConfigSeeder extends Seeder
         ]);
         DB::table('configs')->insert([
             'key' => 'shein_uid',
-            'value' => '4126990885'
+            'value' => '1103207067'
         ]);
         DB::table('configs')->insert([
             'key' => 'x-gw-auth',
             'value' => 'a=vhOvoNStVeIKfdWT0Gp55rGPHqjicT@8.6.4&b=1671815988939&d=-884979813&e=rfVOeZTgwNjc2OTc4MTkxYjk5ZGVhZWNlZDZhZTQ5MThhZWQ4YzVjMmUzNGIzOTE2Yzg5Y2Y5MWI2Y2I3ZWIyNjI4Mg%3D%3D'
+        ]);
+        DB::table('configs')->insert([
+            'key' => 'address_id',
+            'value' => '426631032'
         ]);
     }
 }
