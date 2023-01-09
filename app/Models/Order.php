@@ -26,4 +26,8 @@ class Order extends Model
             send_update($order);
         }));
     }
+
+    public function combined_order(){
+        return $this->belongsTo(CombinedOrder::class);
+    }
 }

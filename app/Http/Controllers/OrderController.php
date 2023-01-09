@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Utility\SheinOrderUtility;
 use LaravelDaily\Invoices\Invoice;
 use App\Http\Requests\OrderRequest;
+use App\Models\CombinedOrder;
 use Illuminate\Support\Facades\Bus;
 use LaravelDaily\Invoices\Classes\Buyer;
 use LaravelDaily\Invoices\Classes\Party;
@@ -51,22 +52,38 @@ class OrderController extends Controller
 
     public function store(OrderRequest $request)
     {
-        $order = Order::create($request->only('goods_id', 'sku', 'quantity', 'variant', 'order_id', 'order_details_id'));
+        log_res($request);
+        $combined_order = new CombinedOrder;
 
-        Bus::chain([
-            new CartJob($order),
+        $combined_order->main_order_id = $request->order_id;
+        $combined_order->save();
+        $combined_order = $combined_order->fresh();
+
+        // return $request->orders;
+        foreach ($request->orders as $key => $order) {
+            $combined_order->orders()->create($order);
+        }
+
+        $jobsArr = [];
+        $orders = $combined_order->orders;
+        foreach ($orders as $key => $order) {
+            array_push($jobsArr, new CartJob($order));
+        }
+
+        $jobsArr = array_merge($jobsArr, [
             new CheckoutJob($order),
             new PlaceOrderJob($order),
             new CODJob($order),
-        ])->catch(function (Throwable $e = null) use ($order) {
-            // global $order;
-            log_res($e->getMessage());
+        ]);
+
+        Bus::chain($jobsArr)->catch(function (Throwable $e = null) use ($order) {
+            log_res($e);
             $order->status = "Failed :: " . $e->getMessage();
             $order->save();
         })->dispatch();
         return response()->json([
             "success" => true,
-            "order" => $order
+            "order" => $orders
         ]);
     }
 

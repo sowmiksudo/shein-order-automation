@@ -66,10 +66,11 @@ class CartJob implements ShouldQueue
                 break;
             }
         }
+        $skus = $order->combined_order->orders->pluck('sku');
         foreach ($shops as $key => $shop) {
             foreach ($shop->contentData as $key => $value) {
                 foreach ($value->productLineInfoList as $key => $value) {
-                    if ($value->product->sku_code != $order->sku && $value->is_checked == 1) {
+                    if ($value->is_checked == 1 && !in_array($value->product->sku_code, $skus->toArray())) {
                         $res = $client->change_cart_item_status($value->id, 2);
                         log_res($res->getContents(), 'Unselect other cart Items');
                     }

@@ -23,12 +23,15 @@ class OrderRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'goods_id'=>['required'],
-            'sku' => ['required'],
-            'order_details_id' => ['required'],
-            'order_id' => ['required'],
-            'quantity' => ['required', 'integer']
+        $rules = [
+            "order_id" => "string|required",
+            "orders" => "array|min:1",
+            'orders.*.goods_id'=>['required'],
+            'orders.*.sku' => ['required'],
+            'orders.*.order_details_id' => ['required'],
+            'orders.*.order_id' => ['required'],
+            'orders.*.quantity' => ['required', 'integer']
         ];
+        return $rules;
     }
 }

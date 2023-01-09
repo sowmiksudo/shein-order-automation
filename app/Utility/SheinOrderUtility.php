@@ -657,7 +657,7 @@ class SheinOrderUtility
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'http://localhost/comp/api/orders/shein/update',
+            CURLOPT_URL => env('APP_MAIN').'/api/orders/shein/update',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,

@@ -1,8 +1,10 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
+use App\Models\Order;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +19,10 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('/ip', [OrderController::class, 'ip']);
+
+Route::get('/', function(){
+    return redirect()->route('dashboard');
+});
 
 Route::middleware(['auth', 'verified'])
     ->resource('dashboard', OrderController::class)
