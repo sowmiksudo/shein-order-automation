@@ -10,6 +10,9 @@
                     Product ID
                 </th>
                 <th scope="col" class="px-6 py-3">
+                    Description
+                </th>
+                <th scope="col" class="px-6 py-3">
                     Quantity
                 </th>
                 <th scope="col" class="px-6 py-3">
@@ -34,6 +37,9 @@
                     </th>
                     <td class="px-6 py-4">
                         {{ $order->goods_id }}
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ $order->description }}
                     </td>
                     <td class="px-6 py-4">
                         {{ $order->quantity }}

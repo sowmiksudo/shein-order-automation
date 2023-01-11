@@ -29,7 +29,7 @@ class OrderController extends Controller
     public function index()
     {
         return view('order.index', [
-            'orders' => Order::paginate(20)
+            'orders' => Order::orderBy('id', 'desc')->paginate(20)
         ]);
     }
 
@@ -52,7 +52,6 @@ class OrderController extends Controller
 
     public function store(OrderRequest $request)
     {
-        log_res($request);
 
         $combined_order = new CombinedOrder;
 

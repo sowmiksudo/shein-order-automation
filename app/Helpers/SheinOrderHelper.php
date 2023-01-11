@@ -37,3 +37,17 @@ function send_update($order){
     $client = new SheinOrderUtility;
     return $client->send_update($order);
 }
+
+function update_orders($order, $status = null, $bill = null, $price = null, $receipt = null, $cat_id = null, $description = null){
+    $orders = $order->combined_order->orders;
+    foreach ($orders as $key => $order) {
+        ($status === null) ?: $order->status = $status;
+        ($bill === null) ?: $order->billno = $bill;
+        ($price === null) ?: $order->price = $price;
+        ($receipt === null) ?: $order->raw_receipt = $receipt;
+        ($cat_id === null) ?: $order->cat_id = $cat_id;
+        ($description === null) ?: $order->description = $description;
+        ($status === null && $bill === null && $price === null && $receipt === null && $cat_id === null && $description === null) ?: $order->save();
+    }
+    return true;
+}

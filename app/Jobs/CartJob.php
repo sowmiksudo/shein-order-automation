@@ -38,23 +38,21 @@ class CartJob implements ShouldQueue
     {
         $client = new SheinOrderUtility;
         $order = $this->order;
-        $order->status = 'processing';
-        $order->save();
-
-        $client->send_update($order);
+        $status = 'processing';
+        update_orders($order, $status);
 
         $product = json_decode($client->get_product_info($order->goods_id));
 
-        $order->cat_id = $product->info->cat_id;
-        $order->description = $product->info->goods_name . ' - ' . $order->variant;
-        $order->save();
+        $cat_id = $product->info->cat_id;
+        $description = $product->info->goods_name . ' - ' . $order->variant;
+        update_orders($order, cat_id: $cat_id, description: $description);
 
         $response = $client->addToCart($order->goods_id, $order->sku);
         log_res($response, "Add to cart | {$order->goods_id} | {$order->sku}");
         $cart = json_decode($client->get_cart());
         if ($cart->code != 0) {
-            $order->status = 'Failed: cart response code mismatch';
-            $order->save();
+            $status = 'Failed: cart response code mismatch';
+            update_orders($order, $status);
             $this->fail();
             return;
         }

@@ -43,24 +43,20 @@ class CODJob implements ShouldQueue
         $order_sum = json_decode($client->order_sum($bill));
         $amount = $order_sum->info->totalPrice->usdAmount;
         $receipt = json_encode($order_sum->info);
-        $order->price = $amount;
-        $order->save();
-
-        $order->raw_receipt = $receipt;
-        $order->save();
+        update_orders($order, null, $bill, $amount, $receipt);
 
         log_res(json_encode($order_sum), 'Order receipt');
 
         if(!isset($order_sum->info->payOrder)){
-            $order->status = 'Failed: Could not confirm Cash on delivery | ' . json_decode($order_sum)->msg;
-            $order->save();
+            $status = 'Failed: Could not confirm Cash on delivery | ' . json_decode($order_sum)->msg;
+            update_orders($order, $status);
             $this->fail();
             return;
         }
 
         log_res($res->getContents(), 'Confirm COD');
 
-        $order->status = 'success';
-        $order->save();
+        $status = 'success';
+        update_orders($order, $status);
     }
 }

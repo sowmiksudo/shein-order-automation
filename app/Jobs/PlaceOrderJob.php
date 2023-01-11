@@ -34,6 +34,7 @@ class PlaceOrderJob implements ShouldQueue
      *
      * @return void
      */
+
     public function handle()
     {
         $order = $this->order;
@@ -44,17 +45,14 @@ class PlaceOrderJob implements ShouldQueue
         log_res(json_encode($res), 'Place Order');
 
         if($res->code != "0"){
-            $order->status = 'Failed: Could not place order | ' . $res->msg;
-            $order->save();
+            $status = 'Failed: Could not place order | ' . $res->msg;
+            update_orders($order, $status);
             $this->fail();
             return;
         }
 
         $bill = $res->info->order->billno;
         $amount = $res->info->totalPrice->amount ?? null;
-        $order->billno = $bill;
-        $order->price = $amount;
-        $order->save();
-
+        update_orders($order, null, $bill, $amount);
     }
 }
