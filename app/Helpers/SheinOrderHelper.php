@@ -16,7 +16,6 @@ function get_token(){
 
 function log_res($log, $from = ""){
     // dump(json_decode($log));
-    dump($from);
     Log::channel('shein')->info($log . "|| $from ||");
 }
 

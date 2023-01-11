@@ -7,11 +7,11 @@
     "require": {
         "php": "^8.0.2",
         "guzzlehttp/guzzle": "^7.2",
+        "ign0r3dh4x0r/laravel-invoices": "dev-master",
         "laracasts/flash": "^3.2",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
-        "laraveldaily/laravel-invoices": "3.0",
         "opcodesio/log-viewer": "^1.7"
     },
     "require-dev": {

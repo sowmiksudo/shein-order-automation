@@ -8,7 +8,6 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use App\Utility\SheinOrderUtility;
 
 class CartJob implements ShouldQueue
@@ -21,7 +20,7 @@ class CartJob implements ShouldQueue
      * @return void
      */
 
-    public $order;
+    private $order;
 
     public $tries = 3;
 
@@ -42,7 +41,7 @@ class CartJob implements ShouldQueue
         $order->status = 'processing';
         $order->save();
 
-        // $client->send_update($order);
+        $client->send_update($order);
 
         $product = json_decode($client->get_product_info($order->goods_id));
 
@@ -89,4 +88,5 @@ class CartJob implements ShouldQueue
         }
 
     }
+
 }

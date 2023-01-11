@@ -19,11 +19,11 @@ class IpLoggerJob implements ShouldQueue
      * @return void
      */
 
-    public $info; 
+    protected $info;
 
     public function __construct($info)
     {
-        $this->info = $info;
+        $this->info = json_decode($info);
     }
 
     /**
@@ -33,6 +33,6 @@ class IpLoggerJob implements ShouldQueue
      */
     public function handle()
     {
-        echo $this->info;
+        return $this->info;
     }
 }

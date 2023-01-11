@@ -53,18 +53,20 @@ class OrderController extends Controller
     public function store(OrderRequest $request)
     {
         log_res($request);
+
         $combined_order = new CombinedOrder;
 
         $combined_order->main_order_id = $request->order_id;
         $combined_order->save();
         $combined_order = $combined_order->fresh();
 
-        // return $request->orders;
         foreach ($request->orders as $key => $order) {
             $combined_order->orders()->create($order);
         }
 
-        $jobsArr = [];
+        $jobsArr = [
+        ];
+
         $orders = $combined_order->orders;
         foreach ($orders as $key => $order) {
             array_push($jobsArr, new CartJob($order));
@@ -83,7 +85,7 @@ class OrderController extends Controller
         })->dispatch();
         return response()->json([
             "success" => true,
-            "order" => $orders
+            "orders" => $orders
         ]);
     }
 
